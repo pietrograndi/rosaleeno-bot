@@ -1,0 +1,34 @@
+version: "3.9"
+
+services:
+  telegram-gateway:
+    image: node:20-alpine
+    container_name: telegram-gateway
+    working_dir: /app
+    command: sh -lc "corepack enable && pnpm install --frozen-lockfile && pnpm --filter telegram-gateway build && node apps/telegram-gateway/dist/index.js"
+    env_file:
+      - ./apps/telegram-gateway/.env
+    volumes:
+      - ./:/app
+      - telegram_data:/app/apps/telegram-gateway/data
+    ports:
+      - "3000:3000"
+    restart: unless-stopped
+
+  rss-watcher:
+    image: node:20-alpine
+    container_name: rss-watcher
+    working_dir: /app
+    command: sh -lc "corepack enable && pnpm install --frozen-lockfile && pnpm --filter rss-watcher build && node apps/rss-watcher/dist/index.js"
+    env_file:
+      - ./apps/rss-watcher/.env
+    volumes:
+      - ./:/app
+      - rss_data:/app/apps/rss-watcher/data
+    depends_on:
+      - telegram-gateway
+    restart: unless-stopped
+
+volumes:
+  telegram_data:
+  rss_data:
