@@ -5,7 +5,7 @@ services:
     image: node:20-alpine
     container_name: telegram-gateway
     working_dir: /app
-    command: sh -lc "corepack enable && pnpm install --frozen-lockfile && pnpm --filter telegram-gateway build && node apps/telegram-gateway/dist/index.js"
+    command: sh -lc "corepack enable && CI=true pnpm install --no-frozen-lockfile && pnpm --filter telegram-gateway build && node apps/telegram-gateway/dist/index.js"
     env_file:
       - ./apps/telegram-gateway/.env
     volumes:
