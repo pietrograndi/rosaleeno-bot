@@ -55,13 +55,17 @@ async function runOnce(): Promise<void> {
 
     if (feed.items[0]) {
       const latestTitle = buildAudioTitle(feed.items[0].title, feed.items[0].pubDate, feed.items[0].id);
-      await setLatestAudio(env.GATEWAY_URL, {
-        audioUrl: feed.items[0].audioUrl,
-        caption: feed.items[0].title,
-        title: latestTitle,
-        performer: feed.feedTitle,
-        sourceItemId: feed.items[0].id
-      });
+      try {
+        await setLatestAudio(env.GATEWAY_URL, {
+          audioUrl: feed.items[0].audioUrl,
+          caption: feed.items[0].title,
+          title: latestTitle,
+          performer: feed.feedTitle,
+          sourceItemId: feed.items[0].id
+        });
+      } catch (error) {
+        logger.warn({ err: error }, 'latest audio sync failed, will retry on next poll');
+      }
     }
     logger.info(
       {
