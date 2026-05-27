@@ -4,8 +4,8 @@ services:
   telegram-gateway:
     image: node:20-alpine
     container_name: telegram-gateway
-    working_dir: /app
-    command: sh -lc "corepack enable && CI=true pnpm install --no-frozen-lockfile && pnpm --filter telegram-gateway build && node apps/telegram-gateway/dist/index.js"
+    working_dir: /app/apps/telegram-gateway
+    command: sh -lc "corepack enable && CI=true pnpm install --no-frozen-lockfile && pnpm --filter telegram-gateway build && node dist/index.js"
     env_file:
       - ./apps/telegram-gateway/.env
     volumes:
@@ -18,8 +18,8 @@ services:
   rss-watcher:
     image: node:20-alpine
     container_name: rss-watcher
-    working_dir: /app
-    command: sh -lc "corepack enable && CI=true pnpm install --no-frozen-lockfile && pnpm --filter rss-watcher build && node apps/rss-watcher/dist/index.js"
+    working_dir: /app/apps/rss-watcher
+    command: sh -lc "corepack enable && CI=true pnpm install --no-frozen-lockfile && pnpm --filter rss-watcher build && node dist/index.js"
     env_file:
       - ./apps/rss-watcher/.env
     volumes:
