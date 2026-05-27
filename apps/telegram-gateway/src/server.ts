@@ -3,7 +3,7 @@ import { z } from 'zod';
 import pino from 'pino';
 import { bot } from './bot';
 import { env } from './config';
-import { listSubscribers } from './storage';
+import { listSubscribers, setLatestAudio } from './storage';
 
 const logger = pino({ name: `${env.BOT_NAME}:api` });
 
@@ -29,6 +29,14 @@ const broadcastAudioPayloadSchema = z.object({
   caption: z.string().min(1).optional(),
   title: z.string().min(1).optional(),
   performer: z.string().min(1).optional()
+});
+
+const latestAudioPayloadSchema = z.object({
+  audioUrl: z.string().url(),
+  caption: z.string().min(1).optional(),
+  title: z.string().min(1).optional(),
+  performer: z.string().min(1).optional(),
+  sourceItemId: z.string().min(1).optional()
 });
 
 export function buildServer() {
@@ -131,6 +139,23 @@ export function buildServer() {
 
     logger.info({ sent, failed, audioUrl: parsed.data.audioUrl }, 'broadcast audio finished');
     return { ok: true, sent, failed, total: results.length };
+  });
+
+  app.post('/internal/latest-audio', async (request, reply) => {
+    const parsed = latestAudioPayloadSchema.safeParse(request.body);
+    if (!parsed.success) {
+      return reply.code(400).send({
+        error: 'invalid_payload',
+        details: parsed.error.flatten()
+      });
+    }
+
+    await setLatestAudio({
+      ...parsed.data,
+      updatedAt: new Date().toISOString()
+    });
+    logger.info({ audioUrl: parsed.data.audioUrl }, 'latest audio updated');
+    return { ok: true };
   });
 
   return app;

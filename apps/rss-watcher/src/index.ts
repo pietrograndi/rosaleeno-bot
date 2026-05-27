@@ -1,6 +1,6 @@
 import pino from 'pino';
 import { env } from './config';
-import { broadcastAudio } from './broadcaster';
+import { broadcastAudio, setLatestAudio } from './broadcaster';
 import { fetchFeedItems } from './rss-client';
 import { loadState, saveState } from './state-repo';
 
@@ -52,6 +52,17 @@ async function runOnce(): Promise<void> {
     const feed = await fetchFeedItems(env.RSS_FEED_URL);
     const seen = new Set(state.seenItemIds);
     const unseenItems = feed.items.filter((item) => !seen.has(item.id));
+
+    if (feed.items[0]) {
+      const latestTitle = buildAudioTitle(feed.items[0].title, feed.items[0].pubDate, feed.items[0].id);
+      await setLatestAudio(env.GATEWAY_URL, {
+        audioUrl: feed.items[0].audioUrl,
+        caption: feed.items[0].title,
+        title: latestTitle,
+        performer: feed.feedTitle,
+        sourceItemId: feed.items[0].id
+      });
+    }
     logger.info(
       {
         stateFilePath: env.STATE_FILE_PATH,

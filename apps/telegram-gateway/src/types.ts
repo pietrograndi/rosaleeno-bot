@@ -20,3 +20,12 @@ export type NotifyAudioPayload = {
   title?: string;
   performer?: string;
 };
+
+export type LatestAudio = {
+  audioUrl: string;
+  caption?: string;
+  title?: string;
+  performer?: string;
+  sourceItemId?: string;
+  updatedAt: string;
+};

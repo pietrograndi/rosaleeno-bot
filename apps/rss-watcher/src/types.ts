@@ -17,3 +17,7 @@ export type BroadcastAudioPayload = {
   title?: string;
   performer?: string;
 };
+
+export type LatestAudioPayload = BroadcastAudioPayload & {
+  sourceItemId?: string;
+};

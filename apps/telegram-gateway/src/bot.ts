@@ -1,7 +1,12 @@
 import { Bot } from 'grammy';
 import pino from 'pino';
 import { env } from './config';
-import { getSubscriberByTelegramUserId, setSubscriberPaused, upsertSubscriber } from './storage';
+import {
+  getLatestAudio,
+  getSubscriberByTelegramUserId,
+  setSubscriberPaused,
+  upsertSubscriber
+} from './storage';
 
 const logger = pino({ name: `${env.BOT_NAME}:telegram` });
 
@@ -81,6 +86,25 @@ bot.command('resume', async (ctx) => {
   }
 
   await ctx.reply('Ricezione messaggi riattivata.');
+});
+
+bot.command('last', async (ctx) => {
+  const latestAudio = await getLatestAudio();
+  if (!latestAudio) {
+    await ctx.reply('Non ho ancora un audio recente da inviarti.');
+    return;
+  }
+
+  try {
+    await ctx.replyWithAudio(latestAudio.audioUrl, {
+      caption: latestAudio.caption,
+      title: latestAudio.title,
+      performer: latestAudio.performer
+    });
+  } catch (error) {
+    logger.error({ err: error, chatId: ctx.chat.id }, 'failed to send latest audio');
+    await ctx.reply('Non riesco a inviarti l ultimo audio in questo momento.');
+  }
 });
 
 export async function startTelegramBot(): Promise<void> {

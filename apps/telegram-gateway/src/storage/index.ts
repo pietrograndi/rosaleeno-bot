@@ -1,5 +1,9 @@
 import { env } from '../config';
-import type { Subscriber } from '../types';
+import type { LatestAudio, Subscriber } from '../types';
+import {
+  getLatestAudio as getLatestAudioFromFile,
+  setLatestAudio as setLatestAudioInFile
+} from './latest-audio-repo';
 import {
   getSubscriberByTelegramUserId as getFileSubscriberByTelegramUserId,
   initFileSubscribersRepo,
@@ -67,4 +71,12 @@ export async function setSubscriberPaused(
   }
 
   return setFileSubscriberPaused(telegramUserId, paused);
+}
+
+export async function getLatestAudio(): Promise<LatestAudio | undefined> {
+  return getLatestAudioFromFile();
+}
+
+export async function setLatestAudio(latestAudio: LatestAudio): Promise<void> {
+  await setLatestAudioInFile(latestAudio);
 }

@@ -1,4 +1,4 @@
-import type { BroadcastAudioPayload } from './types';
+import type { BroadcastAudioPayload, LatestAudioPayload } from './types';
 
 type BroadcastResult = {
   ok: true;
@@ -26,4 +26,19 @@ export async function broadcastAudio(
 
   const parsed = (await response.json()) as BroadcastResult;
   return parsed;
+}
+
+export async function setLatestAudio(gatewayUrl: string, payload: LatestAudioPayload): Promise<void> {
+  const response = await fetch(new URL('/internal/latest-audio', gatewayUrl), {
+    method: 'POST',
+    headers: {
+      'content-type': 'application/json'
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!response.ok) {
+    const body = await response.text();
+    throw new Error(`Aggiornamento latest audio fallito: ${response.status} ${response.statusText} ${body}`);
+  }
 }
