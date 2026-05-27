@@ -10,7 +10,7 @@ services:
       - ./apps/telegram-gateway/.env
     volumes:
       - ./:/app
-      - telegram_data:/app/apps/telegram-gateway/data
+      - ./runtime-data/telegram-gateway:/app/apps/telegram-gateway/data
     ports:
       - "3000:3000"
     restart: unless-stopped
@@ -24,11 +24,7 @@ services:
       - ./apps/rss-watcher/.env
     volumes:
       - ./:/app
-      - rss_data:/app/apps/rss-watcher/data
+      - ./runtime-data/rss-watcher:/app/apps/rss-watcher/data
     depends_on:
       - telegram-gateway
     restart: unless-stopped
-
-volumes:
-  telegram_data:
-  rss_data:
