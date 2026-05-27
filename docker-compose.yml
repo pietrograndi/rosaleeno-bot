@@ -19,7 +19,7 @@ services:
     image: node:20-alpine
     container_name: rss-watcher
     working_dir: /app
-    command: sh -lc "corepack enable && pnpm install --frozen-lockfile && pnpm --filter rss-watcher build && node apps/rss-watcher/dist/index.js"
+    command: sh -lc "corepack enable && CI=true pnpm install --no-frozen-lockfile && pnpm --filter rss-watcher build && node apps/rss-watcher/dist/index.js"
     env_file:
       - ./apps/rss-watcher/.env
     volumes:
