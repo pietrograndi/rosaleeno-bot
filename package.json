@@ -9,5 +9,10 @@
     "dev:rss": "pnpm --filter rss-watcher dev",
     "start": "pnpm --filter telegram-gateway start",
     "start:rss": "pnpm --filter rss-watcher start"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3"
+    ]
   }
 }

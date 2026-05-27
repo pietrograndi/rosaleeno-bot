@@ -6,8 +6,9 @@ const envSchema = z.object({
   PORT: z.coerce.number().int().positive().default(3000),
   HOST: z.string().default('0.0.0.0'),
   BOT_NAME: z.string().default('vdg-telegram-gateway'),
-  SUBSCRIBERS_STORE: z.enum(['file', 'postgres']).default('file'),
-  DATABASE_URL: z.string().optional()
+  SUBSCRIBERS_STORE: z.enum(['file', 'postgres', 'sqlite']).default('file'),
+  DATABASE_URL: z.string().optional(),
+  SQLITE_PATH: z.string().default('data/subscribers.db')
 });
 
 export const env = envSchema.parse(process.env);

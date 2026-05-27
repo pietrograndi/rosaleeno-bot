@@ -18,6 +18,13 @@ import {
   setPostgresSubscriberPaused,
   upsertPostgresSubscriber
 } from './postgres-subscribers-repo';
+import {
+  getSqliteSubscriberByTelegramUserId,
+  initSqliteSubscribersRepo,
+  listSqliteSubscribers,
+  setSqliteSubscriberPaused,
+  upsertSqliteSubscriber
+} from './sqlite-subscribers-repo';
 
 function getDatabaseUrl(): string {
   if (!env.DATABASE_URL) {
@@ -31,6 +38,10 @@ export async function initSubscribersStore(): Promise<void> {
     await initPostgresSubscribersRepo(getDatabaseUrl());
     return;
   }
+  if (env.SUBSCRIBERS_STORE === 'sqlite') {
+    await initSqliteSubscribersRepo(env.SQLITE_PATH);
+    return;
+  }
 
   await initFileSubscribersRepo();
 }
@@ -38,6 +49,10 @@ export async function initSubscribersStore(): Promise<void> {
 export async function upsertSubscriber(subscriber: Subscriber): Promise<void> {
   if (env.SUBSCRIBERS_STORE === 'postgres') {
     await upsertPostgresSubscriber(getDatabaseUrl(), subscriber);
+    return;
+  }
+  if (env.SUBSCRIBERS_STORE === 'sqlite') {
+    await upsertSqliteSubscriber(env.SQLITE_PATH, subscriber);
     return;
   }
 
@@ -50,6 +65,9 @@ export async function getSubscriberByTelegramUserId(
   if (env.SUBSCRIBERS_STORE === 'postgres') {
     return getPostgresSubscriberByTelegramUserId(getDatabaseUrl(), telegramUserId);
   }
+  if (env.SUBSCRIBERS_STORE === 'sqlite') {
+    return getSqliteSubscriberByTelegramUserId(env.SQLITE_PATH, telegramUserId);
+  }
 
   return getFileSubscriberByTelegramUserId(telegramUserId);
 }
@@ -57,6 +75,9 @@ export async function getSubscriberByTelegramUserId(
 export async function listSubscribers(): Promise<Subscriber[]> {
   if (env.SUBSCRIBERS_STORE === 'postgres') {
     return listPostgresSubscribers(getDatabaseUrl());
+  }
+  if (env.SUBSCRIBERS_STORE === 'sqlite') {
+    return listSqliteSubscribers(env.SQLITE_PATH);
   }
 
   return listFileSubscribers();
@@ -68,6 +89,9 @@ export async function setSubscriberPaused(
 ): Promise<Subscriber | undefined> {
   if (env.SUBSCRIBERS_STORE === 'postgres') {
     return setPostgresSubscriberPaused(getDatabaseUrl(), telegramUserId, paused);
+  }
+  if (env.SUBSCRIBERS_STORE === 'sqlite') {
+    return setSqliteSubscriberPaused(env.SQLITE_PATH, telegramUserId, paused);
   }
 
   return setFileSubscriberPaused(telegramUserId, paused);
